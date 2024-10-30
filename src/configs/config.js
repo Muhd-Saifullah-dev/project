@@ -11,9 +11,10 @@ dotenv.config({
 
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI;
-
+const CORS_ORIGIN=process.env.CORS_ORIGIN
 export  {
   PORT,
-  MONGO_URI
+  MONGO_URI,
+  CORS_ORIGIN
 };
 
