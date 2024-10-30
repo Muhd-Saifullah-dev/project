@@ -1,10 +1,19 @@
-import mongoose from "mongoose";
-import {DB_NAME } from "./constant"
+import { app } from "./app.js"
+import { PORT } from "./configs/config.js"
+import connectDB from "./db/index.js"
 
 
 
 
-
+connectDB()
+.then(()=>{
+    app.listen(PORT,()=>{
+        console.log(`Server is Running at PORT : ${PORT}`)
+    })
+})
+.catch((err)=>{
+    console.log('Error in callback mongodb Connection ||| ' , err)
+})
 
 
 
