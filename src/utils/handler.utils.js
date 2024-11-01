@@ -1,27 +1,23 @@
-const okResponse=(res,message,data,status,token=null)=>{
-    const response={
-        success:true,
-        message,
-        data,
-        status,
-        token
+const okResponse = (res, message, data, status, token = null) => {
+  const response = {
+    success: true,
+    message,
+    data,
+    token,
+    status,
+  };
+  return res.status(response.status).json(response);
+};
 
-    }
-    return res.status(status).json(response)
-}
+const handleError = (res, status, message, data) => {
+  const response = {
+    success: false,
+    status,
+    message,
+    data,
+  };
 
-const handleError=(res,status,message,data)=>{
-    const response={
-        success:false,
-        status,
-        message,
-        data
-    }
+  return res.status(response.status).json(response);
+};
 
-    return res.status(response.status).json(response)
-}
-
-export {
-    handleError,
-    okResponse
-}
+export { handleError, okResponse };
