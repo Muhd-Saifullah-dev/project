@@ -3,7 +3,7 @@ import {
   CLAUDHINARY_API_KEY,
   CLAUDHINARY_CLOUD_NAME,
   CLAUDHINARY_SECRET_KEY,
-} from "../configs/config";
+} from "../configs/config.js";
 import fs from "fs";
 
 cloudinary.config({

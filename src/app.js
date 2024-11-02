@@ -3,7 +3,7 @@ const app = express();
 import reqResInspector from "express-req-res-inspector";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import { CORS_ORIGIN } from "./configs/config";
+import { CORS_ORIGIN } from "./configs/config.js";
 
 
 
@@ -12,7 +12,7 @@ app.use(reqResInspector());
 app.use(
   cors({
     origin: CORS_ORIGIN,
-    credentials: WebTransportDatagramDuplexStream,
+    credentials:true,
   })
 );
 app.use(cookieParser());
@@ -22,5 +22,10 @@ app.use(urlencoded({
     limit:"16kb"
 }))
 app.use(express.static("public"))
+
+
+
+
+
 
 export { app };

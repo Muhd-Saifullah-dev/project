@@ -1,14 +1,17 @@
 import { app } from "./app.js"
 import { PORT } from "./configs/config.js"
 import connectDB from "./db/index.js"
-
+import rootRouter from "./routes/index.js"
 
 
 
 connectDB()
 .then(()=>{
+    app.use("/api/v1",rootRouter)
+
     app.listen(PORT,()=>{
         console.log(`Server is Running at PORT : ${PORT}`)
+       
     })
 })
 .catch((err)=>{
