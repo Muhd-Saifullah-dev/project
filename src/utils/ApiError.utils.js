@@ -20,4 +20,25 @@ class ApiError extends Error {
   }
 }
 
-export { ApiError };
+
+class ValidationError extends ApiError{
+  constructor(message,skip=false){
+    super(message,422)
+  }
+}
+
+class BadRequestError extends ApiError{
+  constructor(message,skip=false){
+    super(message,400)
+  }
+}
+
+class UnauthorizedError extends ApiError{
+  constructor(message,skip=false){
+    super(message,401)
+  }
+}
+
+
+
+export { ApiError,BadRequestError,UnauthorizedError,ValidationError };
