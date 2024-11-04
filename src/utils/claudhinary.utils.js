@@ -20,8 +20,8 @@ const uploadClaudhinaryFile = async (LocalfilePath) => {
       resource_type: "auto",
     });
 
-    console.log("File upload Cloud SuccessFully !! ",response)
-    return response
+      fs.unlinkSync(LocalfilePath)
+    return response.secure_url
   } catch (error) {
     fs.unlinkSync(LocalfilePath)  //remove the locally saved temperory file as the upload option got failed
   }

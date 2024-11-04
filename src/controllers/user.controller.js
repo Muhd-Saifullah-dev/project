@@ -31,7 +31,14 @@ const registerUser = async (req, res, next) => {
     
     console.log("REQ FILES",req.files)
     const avatarLocalPath= req.files?.avatar[0]?.path
-    const coverImageLocalPath=req.files?.coverImage[0].path
+        
+    let coverImageLocalPath;
+    if(req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0){
+        console.log("coverImage length",req.files.coverImage.length)
+        coverImageLocalPath=req.files.coverImage[0].path
+    }
+
+    console.log("avatarLocalPath",avatarLocalPath)
     if(!avatarLocalPath){
         throw new ApiError("avatar field is required")
     }
@@ -45,8 +52,8 @@ const registerUser = async (req, res, next) => {
 
    const user=await User.create({
         fullName,
-        avatar:avatar.secure_url,
-        coverImage:coverImage?.secure_url || "",
+        avatar:avatar,
+        coverImage:coverImage || "",
         username:username.toLowerCase(),
         password,
         email
@@ -55,12 +62,18 @@ const registerUser = async (req, res, next) => {
     await user.save()
     user.password=undefined,
     user.refreshToken=undefined
+    user.email=undefined
 
-
-    return okResponse(res,"user created Successfully !! ",user,201)
+    return okResponse(res,"user created Successfully !! ",user,200)
   } catch (error) {
+    // if(error.code===11000){
+    //     console.log("DUPLIATED ERROR")
+    // }else{
+    //     console.log("ERROR IN REGISTER USER ...",error)
+    // }
     console.log("ERROR IN REGISTER USER ...",error)
-  }
+
+    }
 };
 
 export { registerUser };
