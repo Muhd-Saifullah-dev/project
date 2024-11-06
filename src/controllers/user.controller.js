@@ -186,4 +186,54 @@ const incomingCallRefreshToken = async (req, res) => {
     console.log("ERROR IN INCOMING REQUEST", error);
   }
 };
-export { registerUser, loginUser, logoutUser, incomingCallRefreshToken };
+
+const changeCurrentPassword = async (req, res) => {
+  try {
+    const { oldPassword, newPassword } = req.body;
+
+    const user = await User.findById(req.user?._id);
+    if (!user) {
+      throw new ApiError("User not logged in", 401);
+    }
+    const isPasswordCorrect = await user.isPasswordCorrect(oldPassword);
+    if (!isPasswordCorrect) {
+      throw new ApiError("Invalid old password");
+    }
+    user.password = newPassword;
+    await user.save({ validateBeforeSave: false });
+    return okResponse(res, "password changed successfully !", {}, 200);
+  } catch (error) {
+    console.log("ERROR IN PASSWORD CHANGE : ", error);
+  }
+};
+
+const getCurrentUser = async (req, res) => {
+  try {
+    return okResponse(res, "fetched user ! ", req.user, 201);
+  } catch (error) {
+    console.log("ERROR IN GETCURRENTUSER : ", error);
+  }
+};
+
+const updateAccountDetails=async(req,res)=>{
+  try {
+    const {fullName,email}=req.body;
+    if(!fullName || !email){
+      throw new ApiError("Api Error")
+    }
+    throw new ApiError("")
+  } catch (error) {
+    
+  }
+}
+
+
+
+export {
+  registerUser,
+  loginUser,
+  logoutUser,
+  incomingCallRefreshToken,
+  changeCurrentPassword,
+  getCurrentUse,
+};
