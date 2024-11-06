@@ -91,7 +91,7 @@ const loginUser = async (req, res, next) => {
     // send cookies
 
     const { username, email, password } = req.body;
-    if (!username && !email) {
+    if (!(username || email)) {
       throw new ValidationError("username or email is required ");
     }
     const user = await User.findOne({
@@ -133,7 +133,7 @@ const loginUser = async (req, res, next) => {
 
 const logoutUser = async (req, res) => {
   try {
-   await User.findByIdAndUpdate(
+    await User.findByIdAndUpdate(
       req.user._id,
       {
         $set: {
@@ -146,16 +146,44 @@ const logoutUser = async (req, res) => {
     );
 
     const option = {
-        httpOnly: true,
-        secure: true,
-      };
-    res.clearCookie("accessToken", option)
-    res.clearCookie("refreshToken",option)
+      httpOnly: true,
+      secure: true,
+    };
+    res.clearCookie("accessToken", option);
+    res.clearCookie("refreshToken", option);
 
-    return okResponse(res,"user logged Out",{},200)
+    return okResponse(res, "user logged Out", {}, 200);
   } catch (error) {
-    console.log("ERROR IN LOGOUT : ",error)
+    console.log("ERROR IN LOGOUT : ", error);
   }
 };
 
-export { registerUser, loginUser, logoutUser };
+const incomingCallRefreshToken = async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+    if (!user) {
+      throw new ApiError("Invalid token", 404);
+    }
+
+    if (req.cookies?.refreshToken !== user.refreshToken) {
+      throw new ApiError("refresh token is expired", 403);
+    }
+    const option = {
+      httpOnly: true,
+      secure: true,
+    };
+
+    const { accessToken, refreshToken } =
+      await generateAccessTokenAndRefreshToken(user._id);
+
+    res.cookie("accessToken", accessToken, option);
+    res.cookie("refreshToken", refreshToken, option);
+    return okResponse(res, "Access token refreshed successfully", {}, 200, {
+      accessToken: accessToken,
+      refreshToken: refreshToken,
+    });
+  } catch (error) {
+    console.log("ERROR IN INCOMING REQUEST", error);
+  }
+};
+export { registerUser, loginUser, logoutUser, incomingCallRefreshToken };
