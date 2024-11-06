@@ -26,7 +26,7 @@ const verifyJWT = async (req, _, next) => {
 };
 
 
-const refreshAccessTokenMiddle=(req,res,next)=>{
+const refreshAccessTokenMiddle=(req,_,next)=>{
    try {
     const incomingRefreshToken= req.cookies?.refreshToken || req.body?.refreshToken
     if(!incomingRefreshToken){
