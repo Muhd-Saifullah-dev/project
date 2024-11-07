@@ -264,7 +264,9 @@ const updateAvatar = async (req, res) => {
       },
       { new: true }
     ).select("-password -refreshToken");
-
+    if(!user){
+      throw  new ApiError("user not found please login again ",402)
+    }
     return okResponse(
       res,
       "Accounts avatar  updated successfully !",
@@ -287,7 +289,7 @@ const updateCoverImage=async(req,res)=>{
     if(!coverImage){
       throw new ApiError("cover Image is not uploading",400)
     }
-    await User.findByIdAndUpdate(req.user?._id,
+   const user= await User.findByIdAndUpdate(req.user?._id,
       {
         $set:{
           coverImage:coverImage
@@ -296,6 +298,16 @@ const updateCoverImage=async(req,res)=>{
       {new:true}
 
     ).select("-password -refreshToken")
+    if(!user){
+      throw new ApiError("user not found please login again",402)
+    }
+
+    return okResponse(
+      res,
+      "Accounts cover Image updated successfully !",
+      user,
+      200
+    )
   } catch (error) {
     console.log("ERROR IN UPLOAD COVER IMAGE ,",error)
   }
@@ -308,4 +320,6 @@ export {
   changeCurrentPassword,
   getCurrentUser,
   updateAccountDetails,
+  updateCoverImage,
+  updateAvatar
 };
