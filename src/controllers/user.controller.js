@@ -245,6 +245,61 @@ const updateAccountDetails = async (req, res) => {
   }
 };
 
+const updateAvatar = async (req, res) => {
+  try {
+    const avatarLocalPath = req.file?.path;
+    if (!avatarLocalPath) {
+      throw new ApiError("avatar file is missing !", 401);
+    }
+    const avatar = await uploadClaudhinaryFile(avatarLocalPath);
+    if (!avatar) {
+      throw new ApiError("error while uploading the avatar on cloudhinary",400);
+    }
+   const user= await User.findByIdAndUpdate(
+      req.user?._id,
+      {
+        $set: {
+          avatar: avatar,
+        },
+      },
+      { new: true }
+    ).select("-password -refreshToken");
+
+    return okResponse(
+      res,
+      "Accounts avatar  updated successfully !",
+      user,
+      200
+    )
+  } catch (error) {
+    console.log("ERROR AVATAR UPDATE ",error)
+  }
+};
+
+const updateCoverImage=async(req,res)=>{
+  try {
+    const coverImageLocalPath=req.file?.path
+    console.log("COVER IMAGE PATH :: ",req.file)
+    if(!coverImageLocalPath){
+      throw new ApiError("cover image is missing",401)
+    }
+    const coverImage=await uploadClaudhinaryFile(coverImageLocalPath)
+    if(!coverImage){
+      throw new ApiError("cover Image is not uploading",400)
+    }
+    await User.findByIdAndUpdate(req.user?._id,
+      {
+        $set:{
+          coverImage:coverImage
+        }
+      },
+      {new:true}
+
+    ).select("-password -refreshToken")
+  } catch (error) {
+    console.log("ERROR IN UPLOAD COVER IMAGE ,",error)
+  }
+}
 export {
   registerUser,
   loginUser,
