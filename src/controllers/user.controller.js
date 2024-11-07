@@ -215,19 +215,35 @@ const getCurrentUser = async (req, res) => {
   }
 };
 
-const updateAccountDetails=async(req,res)=>{
+const updateAccountDetails = async (req, res) => {
   try {
-    const {fullName,email}=req.body;
-    if(!fullName || !email){
-      throw new ApiError("Api Error")
+    const { fullName, email } = req.body;
+    if (!fullName || !email) {
+      throw new ApiError("email and fullName is required", 401);
     }
-    throw new ApiError("")
+    const user = await User.findByIdAndUpdate(
+      req.user?._id,
+      {
+        $set: {
+          fullName: fullName,
+          email: email,
+        },
+      },
+      { new: true }
+    ).select("-password -refreshToken");
+    if (!user) {
+      throw new ApiError("user not found please login Again", 400);
+    }
+    return okResponse(
+      res,
+      "Accounts details updated successfully !",
+      user,
+      200
+    );
   } catch (error) {
-    
+    console.log("ERROR IN UPDATE ACCOUNTS : ", error);
   }
-}
-
-
+};
 
 export {
   registerUser,
@@ -235,5 +251,6 @@ export {
   logoutUser,
   incomingCallRefreshToken,
   changeCurrentPassword,
-  getCurrentUse,
+  getCurrentUser,
+  updateAccountDetails,
 };
