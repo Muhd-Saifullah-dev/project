@@ -24,5 +24,7 @@ userRouter.post("/refresh-token",refreshAccessTokenMiddle,incomingCallRefreshTok
 
 userRouter.post("change-password",verifyJWT,changeCurrentPassword)
 
+userRouter.post("/cover-image",upload.single('avatar'),verifyJWT,
+)
 
 export default userRouter;

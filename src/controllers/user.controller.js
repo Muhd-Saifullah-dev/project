@@ -255,7 +255,14 @@ const updateAvatar = async (req, res) => {
     if (!avatar) {
       throw new ApiError("error while uploading the avatar on cloudhinary",400);
     }
-   const user= await User.findByIdAndUpdate(
+    const user = await User.findById(req.user?._id);
+    if (!user) {
+      throw new ApiError("User not found, please login again", 402);
+    }
+      const publicIdAvatar=user.avatar;
+
+    console.log("Public Id",publicIdAvatar)
+   const updatedUser= await User.findByIdAndUpdate(
       req.user?._id,
       {
         $set: {
@@ -270,7 +277,7 @@ const updateAvatar = async (req, res) => {
     return okResponse(
       res,
       "Accounts avatar  updated successfully !",
-      user,
+      updatedUser,
       200
     )
   } catch (error) {
@@ -312,6 +319,76 @@ const updateCoverImage=async(req,res)=>{
     console.log("ERROR IN UPLOAD COVER IMAGE ,",error)
   }
 }
+
+
+const getUserChannelProfile=async(req,res)=>{
+  try{
+      const {username}=req.params
+      if(!username?.trim()){
+        throw new ApiError("username is missing",401)
+      } 
+    const channel=await  User.aggregate([
+        {
+          $match:{
+            username:username?.toLowerCase()
+          }
+        },
+        {
+          $lookup:{
+            from:"subscriptions",
+            localField:"_id",
+            foreignField:"channel",
+            as:"subscribers"
+          }
+        },
+        {
+          $lookup:{
+            from:"subscriptions",
+            localField:"_id",
+            foreignField:"subscriber",
+            as:"subscribedTo"
+          }
+        },
+        {
+          $addFields:{
+            subscriberToCount:{
+              $size:"$subscribers"
+            },
+            channelsubscribedToCount:{
+              $size:"$subscribedTo"
+            },
+            isSubcribed:{
+              $cond:{
+                if:{$in:[req.user?._id, "subscribers.subscriber"]},
+                then:true,
+                else:false
+              }
+            }
+          }
+        },
+        {
+          $project:{
+            fullName:1,
+            username:1,
+            subscriberToCount:1,
+            channelsubscribedToCount:1,
+            email:1,
+            avatar:1,
+            coverImage:1,
+            isSubcribed:1,
+          }
+        }
+      ])
+      
+      if(!channel?.length){
+        throw new ApiError("channel doest not exist",400)
+      }
+
+      return okResponse(res,"user channel fetched Successfully",channel[0],200)
+  }catch(err){
+    console.log("ERROR IN GETUSER PROFILE CHANNEL",err)
+  }
+}
 export {
   registerUser,
   loginUser,
@@ -321,5 +398,6 @@ export {
   getCurrentUser,
   updateAccountDetails,
   updateCoverImage,
-  updateAvatar
+  updateAvatar,
+  getUserChannelProfile
 };

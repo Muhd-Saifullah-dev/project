@@ -6,6 +6,8 @@ import {
 } from "../configs/config.js";
 import fs from "fs";
 
+import { ApiError } from "./ApiError.utils.js";
+
 cloudinary.config({
   api_key: CLAUDHINARY_API_KEY,
   api_secret: CLAUDHINARY_SECRET_KEY,
@@ -20,11 +22,39 @@ const uploadClaudhinaryFile = async (LocalfilePath) => {
       resource_type: "auto",
     });
 
-      fs.unlinkSync(LocalfilePath)
-    return response.secure_url
+    fs.unlinkSync(LocalfilePath);
+    return response.secure_url;
   } catch (error) {
-    fs.unlinkSync(LocalfilePath)  //remove the locally saved temperory file as the upload option got failed
+    fs.unlinkSync(LocalfilePath); //remove the locally saved temperory file as the upload option got failed
   }
 };
 
-export { uploadClaudhinaryFile };
+
+const extractPublicIdFromSecureUrl=async(imageurl)=>{
+  const part=imageurl.split("/")
+  const part1=part.pop()
+  const part2 =part1.split('.')
+  const publicId=part2[0]
+  return publicId
+}
+
+
+const deleteCloudhinary = async (imageSecureUrl) => {
+  try {
+    if(!imageSecureUrl){
+      console.log("image secure Url is not found")
+     return null
+    }
+    const publicId=extractPublicIdFromSecureUrl(imageSecureUrl)
+    const deletePreviousImage = await cloudinary.uploader.destroy(publicId,{
+      resource_type:"auto"
+    });
+    if (!deletePreviousImage) return null;
+    console.log("DELETING PREVIOUS : ",deletePreviousImage)
+    return deletePreviousImage
+  } catch (error) {
+    console.log("ERROR IN DELETE PREVIOUS IMAGE :: ",error)
+  }
+};
+
+export { uploadClaudhinaryFile,deleteCloudhinary };
