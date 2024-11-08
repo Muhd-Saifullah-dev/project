@@ -3,6 +3,7 @@ import { User } from "../models/user.model.js";
 import { uploadClaudhinaryFile } from "../utils/claudhinary.utils.js";
 import { okResponse } from "../utils/handlerError.utils.js";
 import { generateAccessTokenAndRefreshToken } from "../utils/access-and-refreshToken.utils.js";
+import mongoose from "mongoose";
 
 const registerUser = async (req, res, next) => {
   try {
@@ -389,6 +390,58 @@ const getUserChannelProfile=async(req,res)=>{
     console.log("ERROR IN GETUSER PROFILE CHANNEL",err)
   }
 }
+
+
+
+const getWatchHistory=async(req,res)=>{
+  try {
+     const user=await User.aggregate([
+        {
+          $match:{
+          _id:new mongoose.Types.ObjectId(req.user?._id)
+        }
+      },
+        {
+          $lookup:{
+            from:"videos",
+            localField:"watchHistory",
+            foreignField:"_id",
+            as:"watchHistory",
+            pipeline:[
+              {
+                $lookup:{
+                  from:"users",
+                  localField:"owner",
+                  foreignField:"_id",
+                  as:"owner",
+                  pipeline:[
+                    {
+                      $project:{
+                        fullName:1,
+                        username:1,
+                        avatar:1,
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                $addFields:{
+                  owner:{ 
+                    $first:"$owner"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ])
+
+      okResponse(res,"Watch history is fetched Successfully!",user[0].watchHistory,200)
+  } catch (error) {
+    console.log("ERROR IN GET WATCH HISTORY",error)
+  }
+}
 export {
   registerUser,
   loginUser,
@@ -399,5 +452,6 @@ export {
   updateAccountDetails,
   updateCoverImage,
   updateAvatar,
-  getUserChannelProfile
+  getUserChannelProfile,
+  getWatchHistory
 };
