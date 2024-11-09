@@ -289,7 +289,7 @@ const updateAvatar = async (req, res) => {
 const updateCoverImage=async(req,res)=>{
   try {
     const coverImageLocalPath=req.file?.path
-    console.log("COVER IMAGE PATH :: ",req.file)
+    console.log("COVER IMAGE PATH  : ",req.file)
     if(!coverImageLocalPath){
       throw new ApiError("cover image is missing",401)
     }
@@ -442,6 +442,8 @@ const getWatchHistory=async(req,res)=>{
     console.log("ERROR IN GET WATCH HISTORY",error)
   }
 }
+
+
 export {
   registerUser,
   loginUser,

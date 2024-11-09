@@ -45,10 +45,8 @@ const deleteCloudhinary = async (imageSecureUrl) => {
       console.log("image secure Url is not found")
      return null
     }
-    const publicId=extractPublicIdFromSecureUrl(imageSecureUrl)
-    const deletePreviousImage = await cloudinary.uploader.destroy(publicId,{
-      resource_type:"auto"
-    });
+    const publicId= await extractPublicIdFromSecureUrl(imageSecureUrl)
+    const deletePreviousImage = await cloudinary.uploader.destroy(publicId);
     if (!deletePreviousImage) return null;
     console.log("DELETING PREVIOUS : ",deletePreviousImage)
     return deletePreviousImage
