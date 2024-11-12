@@ -32,4 +32,5 @@ const uploadClaudhinaryFile = async (LocalfilePath) => {
 
 
 
-export { uploadClaudhinaryFile };
+
+export { uploadClaudhinaryFile};
