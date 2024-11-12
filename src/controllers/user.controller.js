@@ -371,7 +371,7 @@ const getUserChannelProfile = async (req, res) => {
           },
           isSubcribed: {
             $cond: {
-              if: { $in: [req.user?._id, "subscribers.subscriber"] },
+              if: { $in:[req.user?._id, "$subscribers.subscriber"] },
               then: true,
               else: false,
             },

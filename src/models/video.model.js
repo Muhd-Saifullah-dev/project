@@ -32,9 +32,11 @@ const videoSchema =new Schema({
         default:true
     },
     owner:{
-
+            type: Schema.Types.ObjectId,
+            ref: "User"
     }
 }, {timestamps:true})
 
+videoSchema.index({title:'text',description:'text'},{unique:true})
 videoSchema.plugin(aggregatePaginate)
 export const Video=mongoose.model("Video",videoSchema)
